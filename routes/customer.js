@@ -1,7 +1,9 @@
 import express from "express";
 import { Register,Login,logout,generaotp,googleAuthSignIn,verifyotp,resetpassword,finduserbyemail,createResetSession} from "../controllers/auth.js";
 import { auth} from "../middleware/auth.js";
-
+const temp=()=>{
+    throw new error("sasdasd");
+}
 
 const router=express.Router();
 router.post("/signup", Register, async (req, res, next) => {
@@ -13,6 +15,7 @@ router.post("/signup", Register, async (req, res, next) => {
         next(error);
     }
 });
+router.get("/temo",temp);
 router.post("/login",Login);
 router.post("/logout",logout);
 router.post("/google",googleAuthSignIn);

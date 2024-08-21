@@ -18,7 +18,9 @@ const port = process.env.PORT || 5000;
 // Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.get("/test",(req,res) =>{
+    res.send("test working")
+})
 const corsconfig = {
     credentials: true,
     origin: true,
@@ -42,6 +44,7 @@ app.use("/api/cinema", cinemaroute);
 app.use("/api/movie", movieroute);
 app.use("/api/admin", adminroutes);
 app.use("/api/manager", managerroutes);
+app.use("/").get()
 
 // Error handling middleware
 app.use((err, req, res, next) => {
