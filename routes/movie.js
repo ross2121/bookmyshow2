@@ -1,0 +1,11 @@
+import express from "express";
+import {auth,authorizemanager,Adminauthorization} from "../middleware/auth.js";
+import {createMovie,deletemovie,updatemovie,getallmovie,getmoviebyId} from "../controllers/movie.js";
+import { getallcinema } from "../controllers/cinema.js";
+const router=express.Router();
+router.post('/movie',[auth,authorizemanager],createMovie);
+router.patch('/movie/:id',[authorizemanager],updatemovie);
+router.delete('/movie/:id',[authorizemanager],deletemovie);
+router.get('/movie',getallmovie);
+router.get('/movie/:id',getmoviebyId);
+export default router;
