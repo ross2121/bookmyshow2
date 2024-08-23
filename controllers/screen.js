@@ -1,30 +1,30 @@
 import mongoose from "mongoose";
-import Cinema from "../models/cinema.js";
+import screen from "../models/screentime.js";
 import Admin from "../models/admin.js";
 import badrequest from "../errors/badrequest.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 
-export const createCinema=async(req,res)=>{
-    const{name, Address}=req.body;
-    console.log("dsdsa");
+export const createscreen=async(req,res)=>{
+    const{screenId,movieId}=req.body;
+    // console.log("dsdsa");
     req.body.Agent=Admin._id;
     // const user=await User.findById(req.user.id);
-    if(!name||!Address){
+    if(!screenId||!movieId){
         throw new badrequest("Please provode  all values");
     }
-    const cinema=await Cinema.create(req.body);
+    const cinema=await screen.create(req.body);
     console.log("dasd");
     res.status(StatusCodes.CREATED).json({cinema});
 };
 export const updatecinema=async(req,res)=>{
     // const property=await Property.findById(req.Property.id);
     const {id:CinemaId}=req.params;
-    const cinema=await Cinema.findOne({_id:CinemaId});
+    const cinema=await screen.findOne({_id:CinemaId});
     if(!cinema){
         throw new notfound("No cinema found");
     }
-    const updatecinema=await Cinema.findOneAndUpdate({_id:CinemaId},req.body,{
+    const updatecinema=await screen.findOneAndUpdate({_id:CinemaId},req.body,{
         new:true,
         runValidators:true,
     });
@@ -32,17 +32,17 @@ export const updatecinema=async(req,res)=>{
 };
 export const deletecinema=async(req,res)=>{
      const {id:cineamid}=req.params;
-    const cinema=Cinema.findById(cineamid);
+    const cinema=screen.findById(cineamid);
     if(!cinema){
         throw new notfound("No Cinema is found");
     }
-    const deleteproperty=await Cinema.findByIdAndDelete(cineamid);
+    const deleteproperty=await screen.findByIdAndDelete(cineamid);
         req.status(StatusCodes.OK).json({deleteproperty});
     
 }
 export const random=async(req,res)=>{
 
-        const property=await Cinema.aggregate([{$sample:{size:40}}]).populate("Agent","name image").populate("property");
+        const property=await screen.aggregate([{$sample:{size:40}}]).populate("Agent","name image").populate("property");
         res.status(200).json({property});
     
 }
@@ -52,7 +52,7 @@ export const filterpricrange=async(req,res)=>{
 
 export const getallcinema=async(req,res,next)=>{
     try{
-         const property=await Cinema.find().populate("name Address");
+         const property=await screen.find().populate("Admin","name img address");
          return res.status(200).json(property);
     }catch(err){
         next(err);
@@ -60,7 +60,7 @@ export const getallcinema=async(req,res,next)=>{
 };
 export const getcinemabyId=async(req,res,next)=>{
     try {
-        const cinema=await Cinema.findById(req.params.id).populate("name image address");
+        const cinema=await screen.findById(req.params.id).populate("Agent","name image address");
         res.status(200).json(cinema);
     } catch (err) {
         next(err);

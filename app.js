@@ -9,7 +9,7 @@ import cinemaroute from "./routes/cinema.js";
 import movieroute from "./routes/movie.js";
 import customerroutes from "./routes/customer.js";
 import managerroutes from "./routes/manager.js";
-
+import screenroute from "./routes/screen.js";
 dotenv.config();
 
 const app = express();
@@ -44,12 +44,11 @@ app.use("/api/cinema", cinemaroute);
 app.use("/api/movie", movieroute);
 app.use("/api/admin", adminroutes);
 app.use("/api/manager", managerroutes);
-app.use("/").get()
+app.use("/api/screen",screenroute);
 
-// Error handling middleware
+
 app.use((err, req, res, next) => {
     if (res.headersSent) {
-        // If headers are already sent, delegate to default error handler
         return next(err);
     }
     const status = err.status || 500;

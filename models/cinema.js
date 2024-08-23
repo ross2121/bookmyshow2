@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const screenSchema = new mongoose.Schema({
+    screenno:{
+        type:Number,
+        default:0
+    },
     projectionType: {
         type: String,
         default: "INOX"
@@ -28,10 +32,10 @@ const cinemaSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    managerId: {
-        type: Number,
-        required: true
-    },
+    // managerId: {
+    //     type: Number,
+    //     required: true
+    // },
     Address: {
         
             type: String,

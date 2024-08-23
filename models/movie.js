@@ -1,30 +1,32 @@
 import mongoose from "mongoose";
 
 const movie=new mongoose.Schema({
-    name:{
+    title:{
         type:String,
         require:true,
     },
-    timing:{                    
-        type:Number,
+    genre:{                    
+        type:String,
+        require:true
+    },
+    director:{
+        type:String,
         require:true
     },
     duration:{
-        type:Number,
-        require:true
-    },
-    about:{
         type:String,
         require:true,
     },
-    License:{
+    releaseDate:{
         type:String,
         require:true
     },
-    seats:{
-        type:Number,
+    posterUrl:{
+        type:String,
         require:true
-    },
+    }
+       
+    ,
     reviews:
         [{
             customer:{

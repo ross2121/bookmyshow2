@@ -6,14 +6,14 @@ import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 
 export const createMovie=async(req,res)=>{
-    const{name, image,date,screen_no}=req.body;
+    const{title, posterUrl,releaseDate,genre}=req.body;
     req.body.Agent=Manager._id;
     // const user=await User.findById(req.user.id);
-    if(!name||!image||!date||screen_no){
-        throw new badrequest("Please provode  all values");
-    }
-    const cinema=await Movie.create(req.body);
-    res.status(StatusCodes.CREATED).json({property: cinema});
+    // if(!title||!posterUrl||!releaseDate||!genre){
+    //     throw new badrequest("Please provode  all values");
+    // }
+    const movie=await Movie.create(req.body);
+    res.status(StatusCodes.CREATED).json({Movie: movie});
 };
 export const updatemovie=async(req,res)=>{
     // const property=await Property.findById(req.Property.id);
@@ -40,7 +40,7 @@ export const deletemovie=async(req,res)=>{
 }
 export const getallmovie=async(req,res,next)=>{
     try{
-         const property=await Movie.find().populate("Movie","name img timing");
+         const property=await Movie.find().populate("title genre director");
          return res.status(200).json(property);
     }catch(err){
         next(err);
@@ -48,7 +48,7 @@ export const getallmovie=async(req,res,next)=>{
 };
 export const getmoviebyId=async(req,res,next)=>{
     try {
-        const property=await Movie.findById(req.params.id).populate("Movie","name image timing");
+        const property=await Movie.findById(req.params.id).populate("title genre director");
         res.status(200).json(property);
     } catch (err) {
         next(err);
