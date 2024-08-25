@@ -9,9 +9,9 @@ export const createMovie=async(req,res)=>{
     const{title, posterUrl,releaseDate,genre}=req.body;
     req.body.Agent=Manager._id;
     // const user=await User.findById(req.user.id);
-    // if(!title||!posterUrl||!releaseDate||!genre){
-    //     throw new badrequest("Please provode  all values");
-    // }
+    if(!title||!posterUrl||!releaseDate||!genre){
+        throw new badrequest("Please provode  all values");
+    }
     const movie=await Movie.create(req.body);
     res.status(StatusCodes.CREATED).json({Movie: movie});
 };

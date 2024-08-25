@@ -1,16 +1,23 @@
 import mongoose from "mongoose";
-  const screentime=new mongoose.Schema({
-
-    showtimes: [{
-        time:String
-    }],
-    screenId:{
-        type:mongoose.Schema.Types.ObjectId,
-         ref:"cinema"
-        },
+const screentime = new mongoose.Schema({
+    screenId: {
+      type: String,
+    //   ref: 'screen',
+      required: true
+    },
     movieId: {
-type:mongoose.Schema.Types.ObjectId,
-ref:'movie'
-    }
-  })
+      type:String,
+      ref: 'movie',
+      required: true
+    },
+    showtimes: [
+      {
+        time: {
+          type: Date,
+          required: true
+        }
+      }
+    ]
+  });
+  
   export default mongoose.model('screen',screentime);

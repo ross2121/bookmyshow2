@@ -27,7 +27,7 @@ const corsconfig = {
 };
 app.use(cors(corsconfig));
 app.use(cors({
-    origin: 'http://localhost:3000', // Adjust this as needed
+    origin: process.env.PORT_URL, // Adjust this as needed
     credentials: true
 }));
 app.use(session({
