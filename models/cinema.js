@@ -25,7 +25,7 @@ const screenSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
-}, { _id: false });  
+}, { _id: true });  
 
 const cinemaSchema = new mongoose.Schema({
     name: {

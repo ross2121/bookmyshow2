@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Screen from "../models/screentime.js";
 import Admin from "../models/admin.js";
 import badrequest from "../errors/badrequest.js";
-import cinema from "../models/cinema.js";
+import Cinema from "../models/cinema.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 import  movie from  "../models/movie.js"
@@ -57,6 +57,7 @@ export const getallscren=async(req,res,next)=>{
         next(err);
     }
 };
+
 export const getscreencinemaid=async(req,res,next)=>{
     try {
      
@@ -109,10 +110,50 @@ export const getScreensByCinemaIdmovieid = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while fetching screens.' });
   }
 };
+export const getseat=async(req,res,next)=>{
+  try {
+    // const { showtimeId } = req.params.id;
+
+    // Find the screentime by showtimeId
+    const screentime=await Screen.findById(req.params.id).populate("screenId");
+    if (!screentime) {
+      return res.status(404).json({ message: 'Showtime not found' });
+    }
+
+    const screenId = screentime.screenId;
+
+    // Find the cinema that contains this screen
+    const cinema = await Cinema.findOne({ 'screens._id': screenId });
+    if (!cinema) {
+      return res.status(404).json({ message: 'Cinema not found' });
+    }
+
+    // Find the specific screen within the cinema
+    const screen = cinema.screens.id(screenId);
+    if (!screen) {
+      return res.status(404).json({ message: 'Screen not found' });
+    }
+
+    // Extract the required fields
+    const screenData = {
+      rows: screen.rows,
+      columns: screen.columns,
+      price: screen.price,
+      projectionType:screen.projectionType,
+      soundType:screen.soundSystemType,
+      time:screentime.showtimes,
+    };
+
+    res.status(200).json(screenData);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+
+}
 
 export const getcinemabyId=async(req,res,next)=>{
     try {
-        const cinema=await screen.findById(req.params.id).populate("screenId");
+        const cinema=await Screen.findById(req.params.id).populate("screenId");
         res.status(200).json(cinema);
     } catch (err) {
         next(err);

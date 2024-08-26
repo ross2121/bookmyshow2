@@ -49,6 +49,15 @@ export const random=async(req,res)=>{
 export const filterpricrange=async(req,res)=>{
     
 }
+export const rowbyseatid=async(req,res)=>{
+    try {
+     const seatid=req.params.id;
+        const seat=await Cinema.find(seatid);
+        return res.status(seat);
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 export const getallcinema=async(req,res,next)=>{
     try{

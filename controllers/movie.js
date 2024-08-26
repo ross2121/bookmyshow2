@@ -4,6 +4,8 @@ import Manager from "../models/manager.js";
 import badrequest from "../errors/badrequest.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
+import Screen from "../models/screentime.js";
+import cinema from "../models/cinema.js";
 
 export const createMovie=async(req,res)=>{
     const{title, posterUrl,releaseDate,genre}=req.body;
@@ -54,5 +56,64 @@ export const getmoviebyId=async(req,res,next)=>{
         next(err);
     }
 }
-
+// export const getseat=async(req,res,next)=>{
+//     try { 
+//      const screentime=await Screen.findById(req.params.id).populate("screenId");
+//       if (!screentime) {
+//         return res.status(404).json({ message: 'Showtime not found' });
+//       }
+//       const screenId = screentime.screenId;
+//       const cinema = await cinema.findOne({ 'screens._id': screenId });
+//       if (!cinema) {
+//         return res.status(404).json({ message: 'Cinema not found' });
+//       }
+//       const screen = cinema.screens.id(screenId);
+//       if (!screen) {
+//         return res.status(404).json({ message: 'Screen not found' });
+//       }
+//       const screenData = {
+//         rows: screen.rows,
+//         columns: screen.columns,
+//         price: screen.price,
+//         projectiontype:screen.projectionType,
+//         soundtype:screen.soundType,
+//       };
+  
+//       res.status(200).json(screenData);
+//     } catch (error) {
+//       res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+  
+  
+export const getmovie=async(req,res,next)=>{
+    try {
+        const movie=req.params.id;
+        
+        console.log(movie);
+        const moviename=await Movie.findById(movie);
+        console.log(moviename);
+        const screentime=await Screen.find({movieId:movie});
+        console.log(screentime);
+        if (!screentime) {
+          return res.status(404).json({ message: 'Showtime not found' });
+        }
+        const screenId = screentime.screenId;
+        console.log(screenId);
+     const cinemain=await cinema.find({'screens._id':screenId})
+     if (!cinema) {
+        return res.status(404).json({ message: 'Cinema not found' });
+      }
+      console.log(cinemain);
+      const cinemadat={
+        moviename:moviename.title,
+        name:cinemain[0].name,
+       Address:cinemain[0].Address,
+       time:screentime[0].showtimes,
+      } 
+      res.status(200).json(cinemadat)
+    } catch (error) {
+        res.status(500).json({message:'servore eror'})
+    }
+}
+  
 
