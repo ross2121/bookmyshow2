@@ -5,7 +5,7 @@ import badrequest from "../errors/badrequest.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 import Screen from "../models/screentime.js";
-import cinema from "../models/cinema.js";
+import Cinema from "../models/cinema.js";
 
 export const createMovie=async(req,res)=>{
     const{title, posterUrl,releaseDate,genre}=req.body;
@@ -85,35 +85,37 @@ export const getmoviebyId=async(req,res,next)=>{
 //     }
   
   
-export const getmovie=async(req,res,next)=>{
-    try {
-        const movie=req.params.id;
-        
-        console.log(movie);
-        const moviename=await Movie.findById(movie);
-        console.log(moviename);
-        const screentime=await Screen.find({movieId:movie});
-        console.log(screentime);
-        if (!screentime) {
-          return res.status(404).json({ message: 'Showtime not found' });
-        }
-        const screenId = screentime.screenId;
-        console.log(screenId);
-     const cinemain=await cinema.find({'screens._id':screenId})
-     if (!cinema) {
-        return res.status(404).json({ message: 'Cinema not found' });
-      }
-      console.log(cinemain);
-      const cinemadat={
-        moviename:moviename.title,
-        name:cinemain[0].name,
-       Address:cinemain[0].Address,
-       time:screentime[0].showtimes,
-      } 
-      res.status(200).json(cinemadat)
-    } catch (error) {
-        res.status(500).json({message:'servore eror'})
-    }
-}
-  
-
+export const getCinemaDetails = async (req, res) => {
+    try{  const movie=req.params.id;
+        // console.log(movie);
+     const moviename=await Movie.findById(movie);
+    //  console.log(moviename);
+     const screentime=await Screen.find({movieId:movie});
+    //  console.log(screentime);
+     if (!screentime) {
+       return res.status(404).json({ message: 'Showtime not found' });
+     }
+     const screenIds = screentime.map(screen => screen.screenId);
+     console.log(screenIds);
+  const cinemain=await Cinema.find({'screens._id':screenIds})
+  if (!Cinema) {
+     return res.status(404).json({ message: 'Cinema not found' });
+   }
+   console.log(cinemain);
+   const cinemadat = cinemain.map(cinema => {
+    // Find the showtimes for the current cinema
+    const cinemaShowtimes = screentime.filter(screen => screen.screenId === cinema.screens[0]._id.toString());
+    
+    return {
+        moviename: moviename.title,
+        name: cinema.name,
+        address: cinema.Address,
+        screenid:screenIds[0],
+        time: cinemaShowtimes.map(screen => screen.showtimes) || 'No showtime available',
+    };
+});
+ 
+   res.status(200).json(cinemadat)
+ } catch (error) {
+     res.status(500).json({message:'servore eror'})
+ }}

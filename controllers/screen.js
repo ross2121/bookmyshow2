@@ -5,8 +5,9 @@ import badrequest from "../errors/badrequest.js";
 import Cinema from "../models/cinema.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
-import  movie from  "../models/movie.js"
+import  Movie from  "../models/movie.js"
 import router from "../routes/admin.js";
+// import movie from "../models/movie.js";
 
 export const createscreen=async(req,res)=>{
     const{screenId,movieId}=req.body;
@@ -61,7 +62,7 @@ export const getallscren=async(req,res,next)=>{
 export const getscreencinemaid=async(req,res,next)=>{
     try {
      
-      const cineamid=await movie.findById().populate("title");
+      const cineamid=await Movie.findById().populate("title");
       res.status(200).json(cineamid);
     } catch (error) {
         
@@ -73,7 +74,7 @@ export const getScreensByCinemaId = async (req, res) => {
     // const screens = await screen.find({ cinemaId }).populate("name image address");
     const screens = await Screen.find({ screenId:cinemaId });
     // Screen.findOne()
-    console.log(screens);
+    // console.log(screens);
     if (!screens || screens.length === 0) {
       return res.status(404).json({ message: 'No screens found for this cinema.' });
     }
@@ -95,7 +96,7 @@ export const getScreensByCinemaIdmovieid = async (req, res) => {
     const screens = await Screen.find({ screenId: cinemaId, movieId: movieId });
   
     // Screen.findOne()
-    console.log(screens);
+    // console.log(screens);
     if (!screens || screens.length === 0) {
       return res.status(404).json({ message: 'No screens found for this cinema.' });
     }
@@ -112,24 +113,28 @@ export const getScreensByCinemaIdmovieid = async (req, res) => {
 };
 export const getseat=async(req,res,next)=>{
   try {
-    // const { showtimeId } = req.params.id;
+    const { showtimeId } = req.params;
 
     // Find the screentime by showtimeId
-    const screentime=await Screen.findById(req.params.id).populate("screenId");
+    const screentime=await Screen.find({'showtimes._id':req.params.id}).populate('screenId');
+    // console.log(req.params.id);
+    // console.log(screentime);
+    const movieid=screentime[0].movieId;
+    const movie=await  Movie.findById(movieid);
     if (!screentime) {
       return res.status(404).json({ message: 'Showtime not found' });
     }
 
-    const screenId = screentime.screenId;
-
-    // Find the cinema that contains this screen
-    const cinema = await Cinema.findOne({ 'screens._id': screenId });
+    const screenIds = screentime[0].screenId;
+    // console.log(screenIds);
+    const cinema = await Cinema.findOne({ 'screens._id': screenIds });
+    // console.log(cinema);
     if (!cinema) {
       return res.status(404).json({ message: 'Cinema not found' });
     }
 
     // Find the specific screen within the cinema
-    const screen = cinema.screens.id(screenId);
+    const screen = cinema.screens.id(screenIds);
     if (!screen) {
       return res.status(404).json({ message: 'Screen not found' });
     }
@@ -142,6 +147,8 @@ export const getseat=async(req,res,next)=>{
       projectionType:screen.projectionType,
       soundType:screen.soundSystemType,
       time:screentime.showtimes,
+      moviename:movie.title,
+      cinemaname:cinema.name
     };
 
     res.status(200).json(screenData);

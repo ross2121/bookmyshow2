@@ -18,6 +18,7 @@ router.post("/login",Login);
 router.post("/logout",logout);
 router.post("/google",googleAuthSignIn);
 router.get("/findbyemail",finduserbyemail);
+router.gr
 router.get("/generateotp",generaotp);
 router.post("/verifyotp",verifyotp);
 router.get("/createresetsession",createResetSession);

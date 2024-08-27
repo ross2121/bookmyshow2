@@ -14,6 +14,7 @@ const screentime = new mongoose.Schema({
       {
         time: {
           type: Date,
+          _id: mongoose.Schema.Types.ObjectId,
           required: true
         }
       }
