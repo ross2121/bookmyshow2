@@ -1,5 +1,6 @@
 import Admin from "../models/agent.js";
 import badrequest from "../errors/badrequest.js";
+import Customer from "../models/customer.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 export const createprofile=async(req,res,next)=>{
@@ -22,8 +23,15 @@ export const updateprofile=async(req,res,next)=>{
    }else{
     throw new notfound("You can only update your profile");
    }
-
-
+}
+export const getuser=async(req,res)=>{
+    try {
+        const user=await  Customer.find().populate("createdAt updatedAt name email role");
+            res.status(StatusCodes.OK.json({user}));
+        
+    } catch (error) {
+        throw new notfound("USer not found");
+    }
 }
  export const getRealtorProfile = async (req, res) => {
         try {

@@ -5,6 +5,7 @@ import otp from "otp-generator"
 import nodemailer from "nodemailer"
 import badrequest from "../errors/badrequest.js"
 import dotenv from "dotenv";
+import Customer from "../models/customer.js";
 // import { retry } from "@reduxjs/toolkit/query";
 // import { use } from "moongose/routes";
 dotenv.config();
@@ -76,6 +77,15 @@ try {
 }
 
 }
+export const getuser = async (req, res, next) => {
+    try {
+      const users = await Customer.find({}, 'name email role createdAt updatedAt'); // Excluding sensitive data
+      res.status(200).json(users);
+    } catch (error) {
+      next(error); // Passing error to the error handling middleware
+    }
+  };
+  
 export const googleAuthSignIn=async(req,res,next)=>{
     const {email,password,name}=req.body
     try {

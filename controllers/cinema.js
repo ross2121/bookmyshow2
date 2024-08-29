@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 
 export const createCinema=async(req,res)=>{
     const{name, Address}=req.body;
-    console.log("dsdsa");
+    // console.log("dsdsa");
     req.body.Agent=Admin._id;
     // const user=await User.findById(req.user.id);
     if(!name||!Address){
