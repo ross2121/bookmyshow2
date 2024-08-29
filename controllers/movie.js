@@ -18,17 +18,24 @@ export const createMovie=async(req,res)=>{
     res.status(StatusCodes.CREATED).json({Movie: movie});
 };
 export const updatemovie=async(req,res)=>{
-    // const property=await Property.findById(req.Property.id);
-    const {id:movieId}=req.params;
-    const movie=await Movie.findOne({_id:movieId});
-    if(!movie){
-        throw new notfound("No movie found");
+    const { id: movieId } = req.params; 
+    const { title,genre,director,releaseDate } = req.body;
+    if (!name || !Address) {
+        throw new badrequest('Please provide all values');
     }
-    const updatemovie=await Movie.findOneAndUpdate({_id:movieId},req.body,{
-        new:true,
-        runValidators:true,
-    });
-    res.status(StatusCodes.OK).json({updatemovie});
+    const cinema = await Movie.findOne({ _id: movieId });  
+    if (!cinema) {
+        throw new NotFoundError(`No cinema with id: ${movieId}`);
+    }
+    const updateMovie = await Movie.findOneAndUpdate(
+        { _id: movieId },
+        req.body,
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+    res.status(StatusCodes.OK).json({ updateMovie });
 };
 export const deletemovie=async(req,res)=>{
      const {id:MovieId}=req.params;

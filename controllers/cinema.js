@@ -4,6 +4,7 @@ import Admin from "../models/admin.js";
 import badrequest from "../errors/badrequest.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
+// import badrequest from "../errors/badrequest.js";
 
 export const createCinema=async(req,res)=>{
     const{name, Address}=req.body;
@@ -17,19 +18,35 @@ export const createCinema=async(req,res)=>{
     console.log("dasd");
     res.status(StatusCodes.CREATED).json({cinema});
 };
-export const updatecinema=async(req,res)=>{
-    // const property=await Property.findById(req.Property.id);
-    const {id:CinemaId}=req.params;
-    const cinema=await Cinema.findOne({_id:CinemaId});
-    if(!cinema){
-        throw new notfound("No cinema found");
+export const updateCinema = async (req, res) => {
+    const { id: cinemaId } = req.params; // Ensure the route is correctly defined to accept an ID parameter
+    const { name, Address } = req.body;
+
+    if (!name || !Address) {
+        throw new badrequest('Please provide all values');
     }
-    const updatecinema=await Cinema.findOneAndUpdate({_id:CinemaId},req.body,{
-        new:true,
-        runValidators:true,
-    });
-    res.status(StatusCodes.OK).json({updateproperty: updatecinema});
+
+    const cinema = await Cinema.findOne({ _id: cinemaId });
+    
+    if (!cinema) {
+        throw new NotFoundError(`No cinema with id: ${cinemaId}`);
+    }
+
+    // Optionally, check permissions if applicable
+    // checkPermissions(req.user, cinema.createdBy);
+
+    const updatedCinema = await Cinema.findOneAndUpdate(
+        { _id: cinemaId },
+        req.body,
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    res.status(StatusCodes.OK).json({ updatedCinema });
 };
+
 export const deletecinema=async(req,res)=>{
      const {id:cineamid}=req.params;
     const cinema=Cinema.findById(cineamid);

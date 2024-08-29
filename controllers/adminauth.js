@@ -6,6 +6,8 @@ import nodemailer from "nodemailer"
 import badrequest from "../errors/badrequest.js"
 import dotenv from "dotenv";
 import Customer from "../models/customer.js";
+import { StatusCodes } from "http-status-codes";
+
 // import { retry } from "@reduxjs/toolkit/query";
 // import { use } from "moongose/routes";
 dotenv.config();
@@ -79,12 +81,55 @@ try {
 }
 export const getuser = async (req, res, next) => {
     try {
-      const users = await Customer.find({}, 'name email role createdAt updatedAt'); // Excluding sensitive data
+      const users = await Customer.find({}, 'name email role createdAt updatedAt'); 
       res.status(200).json(users);
     } catch (error) {
-      next(error); // Passing error to the error handling middleware
+      next(error);
     }
   };
+export const updateuser=async(req,res,next)=>{
+    const { id: userId } = req.params; 
+    const { name,email } = req.body;
+    if (!name || !email) {
+        throw new badrequest('Please provide all values');
+    }
+
+    const cinema = await  Customer.findOne({ _id: userId });
+    
+    if (!cinema) {
+        throw new NotFoundError(`No user with id: ${userId}`);
+    }
+    const updateduser = await Customer.findOneAndUpdate(
+        { _id: userId },
+        req.body,
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
+
+    res.status(StatusCodes.OK).json({ updateduser });
+}
+export const deleateuser=async(req,res,next)=>{
+    const { id: userId } = req.params; 
+    const { name,email } = req.body;
+    if (!name || !email) {
+        throw new badrequest('Please provide all values');
+    }
+
+    const cinema = await  Customer.findOne({ _id: userId });
+    
+    if (!cinema) {
+        throw new NotFoundError(`No user with id: ${userId}`);
+    }
+    const dealetaduser = await Customer.findOneAndDelete(
+        { _id: userId },
+    );
+
+    res.status(StatusCodes.OK).json({dealetaduser});
+}
+
+
   
 export const googleAuthSignIn=async(req,res,next)=>{
     const {email,password,name}=req.body

@@ -1,7 +1,6 @@
 import express from "express";
-import { Register,Login,logout,generaotp,googleAuthSignIn,verifyotp,resetpassword,finduserbyemail,createResetSession,getuser} from "../controllers/adminauth.js";
-import { auth} from "../middleware/auth.js";
-
+import { Register,Login,logout,generaotp,googleAuthSignIn,verifyotp,resetpassword,finduserbyemail,createResetSession,getuser,updateuser,deleateuser} from "../controllers/adminauth.js";
+import { auth,authorizemanager} from "../middleware/auth.js";
 
 const router=express.Router();
 router.post("/signup", Register, async (req, res, next) => {
@@ -20,6 +19,8 @@ router.get("/findbyemail",finduserbyemail);
 router.get("/generateotp",generaotp);
 router.post("/verifyotp",verifyotp);
 router.get("/createresetsession",createResetSession);
+router.patch("/user/:id",[authorizemanager],updateuser);
+router.delete("/user/:id",[authorizemanager],deleateuser);
 router.get("/user",getuser);
 // router.get("/updateprofile",auth,update);
 router.put("/forgotpassword",resetpassword);
