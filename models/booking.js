@@ -1,27 +1,34 @@
 import mongoose from "mongoose";
 const Booking=new mongoose.Schema({
      user_id:{
-        type:mongoose.Schema.Types.ObjectId,
+        type:String,
         require:true,
         ref:"customer"
     },
     seat_id:{
-        type:mongoose.Schema.Types.ObjectId,
-        require:true,
-        ref:"seat"
+       row:{
+        type:Number,
+        default:0
+       },
+       column:{
+        type:Number,
+        default:0
+       }
     },
-     movie_id:{
-        type:mongoose.Schema.Types.ObjectId,
+    movie_id:{
+        type:String,
         require:true,
         ref:"movie" 
     },
     status:{
         type:String,
-        require:true,
+        // require:true,
         default:"pending",
+    },
+    cinema:{
+        type:String,
+        require:true,
     }
-   
-
 },
 {timestamps:true})
 export default mongoose.model("Booking",Booking);

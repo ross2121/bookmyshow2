@@ -1,55 +1,17 @@
-import Seats from "../models/seats";
-import Payment from "../models/payment";
-import Booking from "../models/booking";
-import badrequest from "../errors/badrequest";
-import notfound from "../errors/notfound";
- 
-
-const processPayment=(paymentDetails)=> {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const success = Math.random() > 0.2;
-            resolve(success);
-        }, 2000);
-    });
-}
-export const seatbooking=async(req,res)=>{
-    const {seat_id,paymentDetails,booking_id,user_id}=req.params;
-    if(!seat_id||!paymentDetails||booking_id||user_id){
-throw new badrequest("Error in the ticket");
+import badrequest from "../errors/badrequest.js";
+import Booking from "../models/booking.js";
+import { StatusCodes } from "http-status-codes";
+// import notfound from "../errors/notfound";
+export const createbooking=async(req,res)=>{
+   try {
+    const{cinema,seat_id,user_id,movie_id}=req.body;
+    if(!cinema||!seat_id||!user_id||!movie_id){
+        throw new badrequest("Please provode  all values");
     }
-    const seat=Seats.findById(seat_id);
-    if(seat.status==="Booked"){
-        throw new notfound("Ticket is alredy booked");
-    }
-    seat.status==="Pending";
-    await seat.save();
-    const booking=new Booking({
-        user_id,
-        seat_id,
-       status:"Pending"
-    })
-    booking.save();
-    const paymentSuccess = await processPayment(paymentDetails); 
-    if (paymentSuccess) {
-        booking.status = 'confirmed';
-        await booking.save();
-        seat.status = 'booked';
-        await seat.save();
-        const payment = new Payment({
-            bookingId: booking._id,
-            status: 'completed',
-            amount: paymentDetails.amount,
-            paymentMethod: paymentDetails.method
-        });
-        await payment.save();
-}
-else{
-    seat.status = 'available';
-    await seat.save();
-
-    await Booking.findByIdAndDelete(booking._id); 
-
-    return res.status(400).json({ message: 'Payment failed, seat released' });
-}
-}
+    const booking=await Booking.create(req.body);
+    // console.log("dasd");
+    res.status(StatusCodes.CREATED).json({booking});
+   } catch (error) {
+    console.log(error);
+   } 
+};

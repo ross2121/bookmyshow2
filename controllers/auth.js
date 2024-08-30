@@ -104,6 +104,10 @@ export const googleAuthSignIn=async(req,res,next)=>{
 export const logout=(req,res,next)=>{
     res.clearCookie("acess_token").json({message:"Logged out"})
 }
+export const getalluser=(req,res,next)=>{
+    const userId=req.params.id;
+     const user=Customer.find(userId);
+}
 export const  generaotp=async(req,res)=>{
     req.app.locals.OTP= otp.generate(6,{upperCaseAlphabets:false,specialChars:false,lowerCaseAlphabets:false,digits:true});
    console.log(req.app.locals.OTP)

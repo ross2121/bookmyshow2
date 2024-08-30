@@ -1,38 +1,59 @@
-import Stripe from "stripe"
+import Stripe from "stripe";
 import dotenv from "dotenv";
-dotenv.config();
-export const createpayment=async(req,res)=>{
-    try {
-        const { userId, seats, price } = req.body;
-        const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-        // Create a new Stripe Checkout Session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: [
-                {
-                    price_data: {
-                        currency: 'usd',
-                        product_data: {
-                            name: `Cinema Booking for ${seats.length} seats`,
-                        },
-                        unit_amount: price * 100, // Amount in cents
-                    },
-                    quantity: 1,
-                },
-            ],
-            mode: 'payment',
-            success_url: "http://localhost:3000",
-            cancel_url: "http://localhost:3000",
-            metadata: {
-                userId: userId,
-                seats: JSON.stringify(seats),
-            },
-        });
+import Booking from "../models/booking.js";
+import { StatusCodes } from "http-status-codes"; // Ensure you import StatusCodes
 
-        // Send the session ID back to the client
-        res.json({ sessionId: session.id });
-    } catch (error) {
-        console.error('Error creating Stripe session:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+dotenv.config();
+
+export const createpayment = async (req, res) => {
+  try {
+    const { userId, cinemaName, movieName, seats, price } = req.body;
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: movieName || "Default Movie Name",
+              description: cinemaName || "Default Cinema Name",
+            },
+            unit_amount: price * 100, // Price in smallest currency unit (e.g., paise)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    //   metadata: {
+    //     userId,
+    //     cinemaName,
+    //     movieName,
+    //     seats: JSON.stringify(seats),
+    //   },
+    });
+
+    // Save the booking only after the Stripe session is successfully created
+    const booking = new Booking({
+      user_id: userId,
+      status: "confirmed",
+      cinema: cinemaName,
+      movie_id: movieName,
+      // You can include seats if necessary
+      // seat_id: seats.map(seat => ({
+      //   row: seat.row,
+      //   column: seat.column,
+      // })),
+    });
+    await booking.save();
+
+    // Send the session ID in the response
+    res.status(StatusCodes.CREATED).json({ sessionId: session.id, booking });
+  } catch (error) {
+    console.error("Error creating Stripe session:", error);
+    res.status(500).json({ error: "Failed to create Stripe session" });
+  }
 };

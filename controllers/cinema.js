@@ -31,10 +31,6 @@ export const updateCinema = async (req, res) => {
     if (!cinema) {
         throw new NotFoundError(`No cinema with id: ${cinemaId}`);
     }
-
-    // Optionally, check permissions if applicable
-    // checkPermissions(req.user, cinema.createdBy);
-
     const updatedCinema = await Cinema.findOneAndUpdate(
         { _id: cinemaId },
         req.body,

@@ -21,7 +21,7 @@ export const createscreen=async(req,res)=>{
     console.log("dasd");
     res.status(StatusCodes.CREATED).json({cinema: screen});
 };
-export const updatecinema=async(req,res)=>{
+export const updatescreen=async(req,res)=>{
     // const property=await Property.findById(req.Property.id);
     const {id:CinemaId}=req.params;
     const cinema=await screen.findOne({_id:CinemaId});
@@ -157,6 +157,7 @@ export const getseat=async(req,res,next)=>{
   }
 
 }
+
 
 export const getcinemabyId=async(req,res,next)=>{
     try {

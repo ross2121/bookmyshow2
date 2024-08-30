@@ -7,19 +7,33 @@ const stripe = stripe('sk_test_51PngCWDnV1J5iPkhjADPh6ywXKK9PwrAq412HaqxXiALc3DP
 const app = express();
 app.use(express.static('public'));
 
-export  const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-    
-        price: '{{PRICE_ID}}',
-        quantity: 1,
-      },
-    ],
-    mode: 'payment',
-    success_url: `${YOUR_DOMAIN}?success=true`,
-    cancel_url: `${YOUR_DOMAIN}?canceled=true`, 
-  });
-  res.redirect(303, session.url);
-;
+export  const session=async(req,res) => {
+  const { userId, cinemaName, movieName, seats, price } = req.body;
 
-app.listen(4242, () => console.log('Running on port 4242'));
+  try {
+    // Create a Stripe session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: movieName,
+              description: `${cinemaName} - ${seats.join(", ")}`,
+            },
+            unit_amount: price * 100, // Price in smallest currency unit (e.g., paise)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    });
+    res.json({ sessionId: session.id });
+  } catch (error) {
+    console.error("Error creating Stripe session:", error);
+    res.status(500).json({ error: "Failed to create Stripe session" });
+  }
+}

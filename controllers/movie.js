@@ -44,7 +44,7 @@ export const deletemovie=async(req,res)=>{
         throw new notfound("No movie is found");
     }
     const deleatemovie=await Movie.findByIdAndDelete(MovieId);
-        req.status(StatusCodes.OK).json({ deleatemovie});
+      res.status(StatusCodes.OK).json({ deleatemovie});
     
 }
 export const getallmovie=async(req,res,next)=>{
