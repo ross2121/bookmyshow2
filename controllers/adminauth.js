@@ -79,6 +79,15 @@ try {
 }
 
 }
+export const getuserbyid = async (req, res, next) => {
+    try {
+        const id=req.params.id;
+      const users = await Customer.find({_id:id}); 
+      res.status(200).json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
 export const getuser = async (req, res, next) => {
     try {
       const users = await Customer.find({}, 'name email role createdAt updatedAt'); 

@@ -6,6 +6,7 @@ import Cinema from "../models/cinema.js";
 import notfound from "../errors/notfound.js";
 import { StatusCodes } from "http-status-codes";
 import  Movie from  "../models/movie.js"
+import Booking from "../models/booking.js";
 import router from "../routes/admin.js";
 // import movie from "../models/movie.js";
 
@@ -114,7 +115,7 @@ export const getScreensByCinemaIdmovieid = async (req, res) => {
 export const getseat=async(req,res,next)=>{
   try {
     const { showtimeId } = req.params;
-
+    const { id: screenId } = req.params; 
     // Find the screentime by showtimeId
     const screentime=await Screen.find({'showtimes._id':req.params.id}).populate('screenId');
     // console.log(req.params.id);
@@ -138,8 +139,10 @@ export const getseat=async(req,res,next)=>{
     if (!screen) {
       return res.status(404).json({ message: 'Screen not found' });
     }
-
-    // Extract the required fields
+    const bookedSeats = await Booking.find({ screen_id:screenId })
+    .select('seat_id.row seat_id.column -_id')
+    .lean();
+    // const booking=Booking.find({sc})
     const screenData = {
       rows: screen.rows,
       columns: screen.columns,
@@ -148,7 +151,11 @@ export const getseat=async(req,res,next)=>{
       soundType:screen.soundSystemType,
       time:screentime.showtimes,
       moviename:movie.title,
-      cinemaname:cinema.name
+      cinemaname:cinema.name,
+      bookedSeats: bookedSeats.map(booking => ({
+        seat: booking.seat_id,
+      //   column: booking.seat_id.column,
+      })),
     };
 
     res.status(200).json(screenData);

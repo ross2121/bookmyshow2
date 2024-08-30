@@ -10,6 +10,22 @@ const screentime = new mongoose.Schema({
       ref: 'movie',
       required: true
     },
+    bookedticket:[
+      {
+        row:{
+          type:String,
+          required:true,
+          default:"0"
+        },
+        column:{
+          type:String,
+          required:true,
+          default:"0"
+        }
+
+      },
+
+    ],
     showtimes: [
       {
         time: {
