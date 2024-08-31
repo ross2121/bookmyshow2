@@ -58,7 +58,8 @@ export const deleteProfile = async (req, res) => {
 };
 export const bookingdetailtuser=async(req,res,next)=>{
     const id=req.params.id;
-    const booking=await Booking.find({user_id:id}).populate("user_id cinema ");
+    console.log(id);
+    const booking=await Booking.find({user_id:id}).populate("cinema");
 if(!booking){
     throw new NotFoundError("No booking find");
 }
