@@ -3,6 +3,7 @@ import Customer from '../models/customer.js';
 import badrequest from '../errors/badrequest.js'; 
 import unauthonticated from '../errors/unauthinticated.js';
 import notfound from '../errors/notfound.js';
+import Booking from '../models/booking.js';
 import { jwtDecode } from "jwt-decode";
 export const updateProfile = async (req, res) => {
     const { id: userId } = req.params; // ID of the profile to update
@@ -55,3 +56,11 @@ export const deleteProfile = async (req, res) => {
 
     res.status(StatusCodes.NO_CONTENT).send(); // Send no content status code
 };
+export const bookingdetailtuser=async(req,res,next)=>{
+    const id=req.params.id;
+    const booking=await Booking.find({user_id:id}).populate("user_id cinema ");
+if(!booking){
+    throw new NotFoundError("No booking find");
+}
+res.status(200).json({booking});
+}

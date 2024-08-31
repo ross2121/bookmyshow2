@@ -4,7 +4,7 @@ import { auth} from "../middleware/auth.js";
 import { updateProfile,deleteProfile } from "../controllers/customer.js";
 import {createbooking} from "../controllers/payment.js"
 // import { updateprofile } from "../controllers/admin.js";
-
+import { bookingdetailtuser } from "../controllers/customer.js";
 
 
 
@@ -29,6 +29,8 @@ router.get("/createresetsession",createResetSession);
 router.patch("/updateuser/:id",[auth],updateProfile);
 router.delete("/deleteprofile/:id",[auth],deleteProfile);
 router.post("/booking",createbooking);
+router.get("/booking/:id",bookingdetailtuser);
+
 // router.get("/updateprofile",auth,update);
 router.put("/forgotpassword",resetpassword);
 export default router;

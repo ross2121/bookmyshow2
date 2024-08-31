@@ -1,18 +1,4 @@
 import mongoose from "mongoose";
-
-const SeatSchema = new mongoose.Schema({
-  row: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
-  column: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
-});
-
 const BookingSchema = new mongoose.Schema({
   user_id: {
     type: String,
@@ -35,10 +21,19 @@ const BookingSchema = new mongoose.Schema({
     type:String,
     require:true
   },
-  seat_id: {
-    type: [SeatSchema], // This is an array of SeatSchema objects
-    required: true,
-  },
+  seat_id: 
+     [{
+      row: {
+        type: Number,
+        default: 0,
+        required: true,
+      },
+      column: {
+        type: Number,
+        default: 0,
+        required: true,
+      },
+    }], 
 });
 
 const Booking = mongoose.model("Booking", BookingSchema);

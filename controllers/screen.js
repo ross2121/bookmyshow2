@@ -102,10 +102,8 @@ export const getScreensByCinemaIdmovieid = async (req, res) => {
       return res.status(404).json({ message: 'No screens found for this cinema.' });
     }
     const screenData = screens.map(screen => ({
-      showtimes: screen.showtimes
-      
+      showtimes: screen.showtimes    
     }));
-  
     res.status(200).json(screenData);
   } catch (error) {
     console.error(error);
@@ -125,7 +123,6 @@ export const getseat=async(req,res,next)=>{
     if (!screentime) {
       return res.status(404).json({ message: 'Showtime not found' });
     }
-
     const screenIds = screentime[0].screenId;
     // console.log(screenIds);
     const cinema = await Cinema.findOne({ 'screens._id': screenIds });
@@ -133,8 +130,6 @@ export const getseat=async(req,res,next)=>{
     if (!cinema) {
       return res.status(404).json({ message: 'Cinema not found' });
     }
-
-    // Find the specific screen within the cinema
     const screen = cinema.screens.id(screenIds);
     if (!screen) {
       return res.status(404).json({ message: 'Screen not found' });
@@ -162,6 +157,7 @@ export const getseat=async(req,res,next)=>{
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
+
 
 }
 
