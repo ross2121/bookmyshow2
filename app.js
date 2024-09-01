@@ -81,9 +81,10 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             
             try {
                 const user = await Customer.find({_id:userId});
+                  console.log(user.email);
                 const confirmationEmail = {
                     from: process.env.EMAIL_USERNAME,
-                    to: user.email,
+                    to:user.email,
                     subject: 'Booking Confirmation - BookMyShow',
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
