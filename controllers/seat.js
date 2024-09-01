@@ -1,6 +1,8 @@
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import Booking from "../models/booking.js";
+import movie from "../models/movie.js";
+import Screen from "../models/screentime.js";
 
 dotenv.config();
 
@@ -29,14 +31,12 @@ export const createpayment = async (req, res) => {
           name: movieName || "Default Movie Name",
           description: `Cinema: ${cinemaName} - Seat: ${row}-${column}`,
         },
-        unit_amount: price * 100, // Stripe expects amount in the smallest currency unit (paise for INR)
+        unit_amount: price * 100,
       },
       quantity: 1,
     }));
 
     console.log("Line items generated:", line_items);
-
-    // Check if any line items were created
     if (line_items.length === 0) {
       return res.status(400).json({ error: "No line items provided" });
     }
@@ -46,8 +46,8 @@ export const createpayment = async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: "http://localhost:3000/success",
-      cancel_url: "http://localhost:3000/cancel",
+      success_url: "https://showtimehub.vercel.app/success/:id",
+      cancel_url: "https://showtimehub.vercel.app/cancel/:id",
       metadata: {
         userId: userId,
         cinemaName: cinemaName,
@@ -66,6 +66,58 @@ export const createpayment = async (req, res) => {
     res.status(500).json({ error: "Failed to create Stripe session" });
   }
 };
+export const afterconfirmation=async(req,res)=>{
+ 
+  const bookingID = req.params.id;
+console.log("Booking ID:", bookingID);
+
+const book = await Booking.findById(bookingID).populate("status cinema");
+console.log("Booking:", book);
+
+if (!book) {
+    return res.status(404).json({ message: "Booking not found" });
+}
+
+const screeid = await Screen.findOne({
+  'showtimes._id': book.screen_id
+}).populate('movieId showtimes');
+console.log("Screen ID:", screeid);
+
+if (!screeid) {
+    return res.status(404).json({ message: "Screen not found" });
+}
+
+const movieid = await movie.findById(screeid.movieId).populate("Trailer");
+console.log("Movie ID:", movieid);
+
+res.status(200).json({ movieid, book, screeid });
+
+ 
+}
+export const deleteshowtime = async (req, res) => {
+  try {
+    const { id: showtimeId } = req.params;
+    const screen = await Screen.findOne({ "showtimes._id": showtimeId });
+    if (!screen) {
+      return res.status(404).json({ message: "Showtime not found" });
+    }
+    const updatedScreen = await Screen.findOneAndUpdate(
+      { "showtimes._id": showtimeId },
+      { $pull: { showtimes: { _id: showtimeId } } },
+      { new: true }
+    );
+    if (updatedScreen.showtimes.length === 0) {
+      await Screen.deleteOne({ _id: updatedScreen._id });
+      return res.status(200).json({ message: "Showtime and Screen deleted" });
+    }
+
+    res.status(200).json({ updatedScreen });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 export const screeafterbooked = async (req, res) => {
   const { id: screenId } = req.params;

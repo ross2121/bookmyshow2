@@ -13,7 +13,7 @@ import Stripe from "stripe";
 import dotenv from "dotenv";
 import Booking from "../models/booking.js";
 import nodemailer from "nodemailer";
-import { screeafterbooked, createpayment } from "../controllers/seat.js";
+import { screeafterbooked, createpayment,afterconfirmation,deleteshowtime } from "../controllers/seat.js";
 
 dotenv.config();
 const router=Router();
@@ -25,6 +25,8 @@ router.get('/screen/cinema/:id', getScreensByCinemaId);
 router.get('/screen/:cinemaId/:movieId', getScreensByCinemaIdmovieid);
 router.get('/screen/cinema/:id/seat', getseat);
 router.post('/payment', createpayment);
+router.delete('/screen/:id',deleteshowtime);
+router.get('/booking/sucess/:id',afterconfirmation);
 
 
 export default router;
