@@ -21,7 +21,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Body parser middleware
 app.use(bodyParser.json({
     verify: (req, res, buf) => {
         const url = req.originalUrl;
@@ -31,7 +30,6 @@ app.use(bodyParser.json({
     }
 }));
 
-// Stripe webhook endpoint
 app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -65,15 +63,6 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             try {
                 await booking.save();
                 console.log("Booking successfully saved!");
-
-                const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
-                const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
-
-                await stripe.checkout.sessions.update(session.id, {
-                    success_url: successUrl,
-                    cancel_url: cancelUrl,
-                });
-
             } catch (error) {
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
