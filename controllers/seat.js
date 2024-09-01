@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import Booking from "../models/booking.js";
 import Movie from "../models/movie.js";
 import Screen from "../models/screentime.js";
+import customer from "../models/customer.js";
 
 dotenv.config();
 
@@ -66,10 +67,8 @@ export const createpayment = async (req, res) => {
 
 export const afterconfirmation = async (req, res) => {
   try {
-    const bookingID = req.params.id;
-    console.log("Booking ID:", bookingID);
-
-    const book = await Booking.findById(bookingID).populate("status cinema");
+    const user = req.params.id;
+    const book = await Booking.find({user_id:user}).populate("status cinema");
     console.log("Booking:", book);
 
     if (!book) {
