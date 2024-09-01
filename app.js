@@ -55,11 +55,11 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 user_id: userId,
                 status: "confirmed",
                 cinema: cinemaName,
-                moviename: movieName,
+                // moviename: movieName,
                 screen_id: screen_id,
                 seat_id: parsedSeats,
-                // movie_id:movie_id,
-                total_price: session.amount_total / 100, 
+                movie_id:movie_id,
+                // total_price: session.amount_total / 100, 
             }); console.log(booking);
             try {
                 await booking.save();
