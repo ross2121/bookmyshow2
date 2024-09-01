@@ -63,5 +63,5 @@ export const bookingdetailtuser=async(req,res,next)=>{
 if(!booking){
     throw new NotFoundError("No booking find");
 }
-res.status(200).json({booking});
+res.status(200).json(booking);
 }

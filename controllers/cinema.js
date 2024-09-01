@@ -50,7 +50,7 @@ export const deletecinema=async(req,res)=>{
         throw new notfound("No Cinema is found");
     }
     const deleteproperty=await Cinema.findByIdAndDelete(cineamid);
-        req.status(StatusCodes.OK).json({deleteproperty});
+     req.status(StatusCodes.OK).json({deleteproperty});
     
 }
 export const random=async(req,res)=>{

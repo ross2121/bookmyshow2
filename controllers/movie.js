@@ -20,9 +20,9 @@ export const createMovie=async(req,res)=>{
 export const updatemovie=async(req,res)=>{
     const { id: movieId } = req.params; 
     const { title,genre,director,releaseDate } = req.body;
-    if (!name || !Address) {
-        throw new badrequest('Please provide all values');
-    }
+    // if (!name || !Address) {
+    //     throw new badrequest('Please provide all values');
+    // }
     const cinema = await Movie.findOne({ _id: movieId });  
     if (!cinema) {
         throw new NotFoundError(`No cinema with id: ${movieId}`);
@@ -117,6 +117,7 @@ export const getCinemaDetails = async (req, res) => {
         moviename: moviename.title,
         name: cinema.name,
         address: cinema.Address,
+        moviegenre:moviename.genre,
         screenid:screenIds[0],
         time: cinemaShowtimes.map(screen => screen.showtimes) || 'No showtime available',
     };

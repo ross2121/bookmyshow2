@@ -42,6 +42,10 @@ const cinemaSchema = new mongoose.Schema({
             required: true
         
     },
+    posterUrl:{
+        type:String,
+        require:true
+    },  
     screens: [screenSchema] 
 }, { timestamps: true });
 

@@ -24,9 +24,11 @@ const movie=new mongoose.Schema({
     posterUrl:{
         type:String,
         require:true
-    }
-       
-    ,
+    },
+    Trailer:{
+        type:String,
+        require:true,
+    },
     reviews:
         [{
             customer:{
