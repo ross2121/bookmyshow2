@@ -23,7 +23,7 @@ const movie=new mongoose.Schema({
     },
     posterUrl:{
         type:String,
-        require:true
+        // require:true
     },
     Trailer:{
         type:String,
