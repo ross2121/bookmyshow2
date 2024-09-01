@@ -41,7 +41,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             const session = event.data.object;
             const { userId, cinemaName, movieName, screen_id, seats, movie_id } = session.metadata;
             let parsedSeats;
-            
+
             try {
                 parsedSeats = JSON.parse(seats);
             } catch (error) {
@@ -53,7 +53,6 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 user_id: userId,
                 status: "confirmed",
                 cinema: cinemaName,
-                // moviename: movieName,
                 screen_id: screen_id,
                 seat_id: parsedSeats,
                 movie_id: movieName,
@@ -67,25 +66,28 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
             }
-            
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.EMAIL_USERNAME,
-                    pass: process.env.EMAIL_PASSWORD,
-                },
-                port: 465,
-                secure: true,
-                host: 'smtp.gmail.com',
-            });
-            
+
+            // Fetch user email from the database using the userId
             try {
-                const email=localStorage.getItem("user");
-                console.log(email);
-                //   console.log(user.email);
+                const user = await Customer.findById(userId);
+                if (!user || !user.email) {
+                    throw new Error("User or email not found");
+                }
+
+                const transporter = nodemailer.createTransport({
+                    service: "gmail",
+                    auth: {
+                        user: process.env.EMAIL_USERNAME,
+                        pass: process.env.EMAIL_PASSWORD,
+                    },
+                    port: 465,
+                    secure: true,
+                    host: 'smtp.gmail.com',
+                });
+
                 const confirmationEmail = {
                     from: process.env.EMAIL_USERNAME,
-                    to:email,
+                    to: user.email,  // Use the user's email retrieved from the database
                     subject: 'Booking Confirmation - BookMyShow',
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
@@ -101,10 +103,10 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                         </div>
                     `,
                 };
-            
+
                 await transporter.sendMail(confirmationEmail);
                 res.status(201).json({ sessionId: session.id, booking });
-            
+
             } catch (error) {
                 console.error("Error sending email:", error);
                 res.status(500).send({ message: "Failed to send confirmation email" });
@@ -115,6 +117,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
         res.status(400).send({ message: "Webhook Error" });
     }
 });
+
 app.use(cors({ credentials: true, origin: true }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'defaultsecret',
