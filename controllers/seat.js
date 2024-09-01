@@ -42,8 +42,8 @@ export const createpayment = async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `https://showtimehub.vercel.app/success/:id`,
-      cancel_url: "https://showtimehub.vercel.app/cancel/:id",
+      success_url: `https://showtimehub.vercel.app/success/${userId}`,
+      cancel_url: `https://showtimehub.vercel.app/cancel/${userId}`,
       metadata: {
         userId: userId,
         cinemaName: cinemaName,
