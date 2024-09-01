@@ -61,8 +61,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 movie_id:movie_id,
                 total_price: session.amount_total / 100, 
             }); console.log(booking);
-            const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
-            const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
+          
 
             try {
                 await booking.save();
@@ -71,7 +70,8 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
             }
-            
+            const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
+            const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
             const updatedSession = await stripe.checkout.sessions.update(session.id, {
                 success_url: successUrl,
                 cancel_url: cancelUrl,
