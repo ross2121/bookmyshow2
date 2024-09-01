@@ -45,12 +45,12 @@ export const updateCinema = async (req, res) => {
 
 export const deletecinema=async(req,res)=>{
      const {id:cineamid}=req.params;
-    const cinema=Cinema.findById(cineamid);
+    const cinema=await Cinema.find({_id:cineamid});
     if(!cinema){
         throw new notfound("No Cinema is found");
     }
-    const deleteproperty=await Cinema.findByIdAndDelete(cineamid);
-     req.status(StatusCodes.OK).json({deleteproperty});
+       const deletecinema=await Cinema.findByIdAndDelete(cineamid);
+     res.status(StatusCodes.OK).json({deletecinema});
     
 }
 export const random=async(req,res)=>{
