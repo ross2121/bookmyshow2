@@ -28,5 +28,5 @@ router.post('/payment', createpayment);
 router.delete('/screen/:id',deleteshowtime);
 router.get('/booking/sucess/:id',afterconfirmation);
 
-
+router.get('d/');
 export default router;
