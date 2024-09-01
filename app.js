@@ -27,7 +27,7 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json({
     verify: function (req, res, buf) {
         var url = req.originalUrl;
-        if (url.startsWith('/api/screen/webhooks')) {  // Note the leading slash
+        if (url.startsWith('/api/screen/webhooks')) { 
             req.rawBody = buf.toString();
         }
     }
@@ -41,7 +41,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
 
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            const { userId, cinemaName, movieName, screen_id, seats } = session.metadata;
+            const { userId, cinemaName, movieName, screen_id, seats,movie_id } = session.metadata;
             let parsedSeats;
             try {
                 parsedSeats = JSON.parse(seats);
@@ -55,11 +55,14 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 user_id: userId,
                 status: "confirmed",
                 cinema: cinemaName,
-                movie_id: movieName,
+                moviename: movieName,
                 screen_id: screen_id,
                 seat_id: parsedSeats,
+                movie_id:movie_id,
                 total_price: session.amount_total / 100, 
             }); console.log(booking);
+            const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
+            const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
 
             try {
                 await booking.save();
@@ -68,6 +71,14 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
             }
+            
+            const updatedSession = await stripe.checkout.sessions.update(session.id, {
+                success_url: successUrl,
+                cancel_url: cancelUrl,
+            });
+
+
+           
             const transporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
