@@ -58,16 +58,12 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
                 moviename: movieName,
                 screen_id: screen_id,
                 seat_id: parsedSeats,
-                movie_id:movie_id,
+                // movie_id:movie_id,
                 total_price: session.amount_total / 100, 
             }); console.log(booking);
-          
-
             try {
                 await booking.save();
-                console.log("Booking successfully saved!");
-                // const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
-           
+                console.log("Booking successfully saved!");  
             } catch (error) {
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
