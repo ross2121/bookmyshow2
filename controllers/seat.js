@@ -12,8 +12,6 @@ export const createpayment = async (req, res) => {
 
     console.log('Received seats:', seats);
     console.log('Price:', price);
-
-    // Ensure seats is an array
     if (!Array.isArray(seats)) {
       return res.status(400).json({ error: "Seats must be an array" });
     }
@@ -22,8 +20,6 @@ export const createpayment = async (req, res) => {
     if (typeof price !== 'number' || isNaN(price)) {
       return res.status(400).json({ error: "Price must be a valid number" });
     }
-
-    // Map seats to line items
     const line_items = seats.map(({ row, column }) => ({
       price_data: {
         currency: "inr",
@@ -46,8 +42,8 @@ export const createpayment = async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: "https://showtimehub.vercel.app/success/:id",
-      cancel_url: "https://showtimehub.vercel.app/cancel/:id",
+      // success_url: `https://showtimehub.vercel.app/success`,
+      // cancel_url: "https://showtimehub.vercel.app/cancel/:id",
       metadata: {
         userId: userId,
         cinemaName: cinemaName,
@@ -90,9 +86,7 @@ if (!screeid) {
 const movieid = await movie.findById(screeid.movieId).populate("Trailer");
 console.log("Movie ID:", movieid);
 
-res.status(200).json({ movieid, book, screeid });
-
- 
+res.status(200).json({ movieid, book, screeid }); 
 }
 export const deleteshowtime = async (req, res) => {
   try {
@@ -117,8 +111,6 @@ export const deleteshowtime = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 export const screeafterbooked = async (req, res) => {
   const { id: screenId } = req.params;
   console.log(screenId);

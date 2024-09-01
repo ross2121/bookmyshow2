@@ -66,19 +66,19 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             try {
                 await booking.save();
                 console.log("Booking successfully saved!");
+                const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
+            const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
+
+             await stripe.checkout.sessions.update(session.id, {
+                success_url: successUrl,
+                cancel_url: cancelUrl,
+            });
             } catch (error) {
                 console.error("Error saving booking:", error);
                 return res.status(500).json({ error: "Booking save failed" });
             }
-            const successUrl = `https://showtimehub.vercel.app/success/${booking._id}`;
-            const cancelUrl = `https://showtimehub.vercel.app/cancel/${booking._id}`;
-            const updatedSession = await stripe.checkout.sessions.update(session.id, {
-                success_url: successUrl,
-                cancel_url: cancelUrl,
-            });
-
-
-           
+            
+          
             const transporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
