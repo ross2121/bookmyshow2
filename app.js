@@ -80,7 +80,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             });
             
             try {
-                const user = await Customer.findById(userId);
+                const user = await Customer.find({_id:userId});
                 const confirmationEmail = {
                     from: process.env.EMAIL_USERNAME,
                     to: user.email,

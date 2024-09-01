@@ -66,15 +66,14 @@ export const createpayment = async (req, res) => {
 };
 
 export const afterconfirmation = async (req, res) => {
-  try {
-    const user = req.params.id;
-    const book = await Booking.find({user_id:user}).populate("status cinema");
+  try { 
+    const user =req.params.id ;
+    const book = await Booking.find({userId:user}).populate("status cinema");
     console.log("Booking:", book);
 
     if (!book) {
       return res.status(404).json({ message: "Booking not found" });
     }
-
     const screen = await Screen.findOne({ 'showtimes._id': book.screen_id }).populate('movieId showtimes');
     console.log("Screen ID:", screen);
 
