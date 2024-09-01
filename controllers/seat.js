@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import Booking from "../models/booking.js";
-import movie from "../models/movie.js";
+import Movie from "../models/movie.js";
 import Screen from "../models/screentime.js";
 
 dotenv.config();
@@ -12,14 +12,15 @@ export const createpayment = async (req, res) => {
 
     console.log('Received seats:', seats);
     console.log('Price:', price);
+
     if (!Array.isArray(seats)) {
       return res.status(400).json({ error: "Seats must be an array" });
     }
 
-
     if (typeof price !== 'number' || isNaN(price)) {
       return res.status(400).json({ error: "Price must be a valid number" });
     }
+
     const line_items = seats.map(({ row, column }) => ({
       price_data: {
         currency: "inr",
@@ -33,6 +34,7 @@ export const createpayment = async (req, res) => {
     }));
 
     console.log("Line items generated:", line_items);
+
     if (line_items.length === 0) {
       return res.status(400).json({ error: "No line items provided" });
     }
@@ -42,17 +44,16 @@ export const createpayment = async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `https://showtimehub.vercel.app/success/${userId}`,
-      cancel_url: `https://showtimehub.vercel.app/cancel/${userId}`,
+      success_url: "https://showtimehub.vercel.app/success/:id",
+      cancel_url: "https://showtimehub.vercel.app/cancel/:id",
       metadata: {
-        userId: userId,
-        cinemaName: cinemaName,
-        movieName: movieName,
-        screen_id: screen_id,
+        userId,
+        cinemaName,
+        movieName,
+        screen_id,
         seats: JSON.stringify(seats),
       },
     });
-    console.log(session.metadata);
 
     console.log('Session created:', session.id);
 
@@ -62,44 +63,51 @@ export const createpayment = async (req, res) => {
     res.status(500).json({ error: "Failed to create Stripe session" });
   }
 };
-export const afterconfirmation=async(req,res)=>{
- 
-  const bookingID = req.params.id;
-console.log("Booking ID:", bookingID);
 
-const book = await Booking.findById(bookingID).populate("status cinema");
-console.log("Booking:", book);
+export const afterconfirmation = async (req, res) => {
+  try {
+    const bookingID = req.params.id;
+    console.log("Booking ID:", bookingID);
 
-if (!book) {
-    return res.status(404).json({ message: "Booking not found" });
-}
+    const book = await Booking.findById(bookingID).populate("status cinema");
+    console.log("Booking:", book);
 
-const screeid = await Screen.findOne({
-  'showtimes._id': book.screen_id
-}).populate('movieId showtimes');
-console.log("Screen ID:", screeid);
+    if (!book) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
-if (!screeid) {
-    return res.status(404).json({ message: "Screen not found" });
-}
+    const screen = await Screen.findOne({ 'showtimes._id': book.screen_id }).populate('movieId showtimes');
+    console.log("Screen ID:", screen);
 
-const movieid = await movie.findById(screeid.movieId).populate("Trailer");
-console.log("Movie ID:", movieid);
+    if (!screen) {
+      return res.status(404).json({ message: "Screen not found" });
+    }
 
-res.status(200).json({ movieid, book, screeid }); 
-}
+    const movie = await Movie.findById(screen.movieId).populate("Trailer");
+    console.log("Movie ID:", movie);
+
+    res.status(200).json({ movie, book, screen }); 
+  } catch (error) {
+    console.error("Error in afterconfirmation:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const deleteshowtime = async (req, res) => {
   try {
     const { id: showtimeId } = req.params;
     const screen = await Screen.findOne({ "showtimes._id": showtimeId });
+
     if (!screen) {
       return res.status(404).json({ message: "Showtime not found" });
     }
+
     const updatedScreen = await Screen.findOneAndUpdate(
       { "showtimes._id": showtimeId },
       { $pull: { showtimes: { _id: showtimeId } } },
       { new: true }
     );
+
     if (updatedScreen.showtimes.length === 0) {
       await Screen.deleteOne({ _id: updatedScreen._id });
       return res.status(200).json({ message: "Showtime and Screen deleted" });
@@ -107,14 +115,16 @@ export const deleteshowtime = async (req, res) => {
 
     res.status(200).json({ updatedScreen });
   } catch (error) {
-    console.error(error);
+    console.error("Error in deleteshowtime:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const screeafterbooked = async (req, res) => {
-  const { id: screenId } = req.params;
-  console.log(screenId);
   try {
+    const { id: screenId } = req.params;
+    console.log(screenId);
+
     const bookedSeats = await Booking.find({ screen_id: screenId })
       .select('seat_id.row seat_id.column -_id')
       .lean();
@@ -125,7 +135,7 @@ export const screeafterbooked = async (req, res) => {
       })),
     });
   } catch (error) {
+    console.error("Error in screeafterbooked:", error);
     res.status(500).json({ message: 'Server error' });
-    console.log(error);
   }
 };
