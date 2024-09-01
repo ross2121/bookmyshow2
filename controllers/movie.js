@@ -118,6 +118,7 @@ export const getCinemaDetails = async (req, res) => {
         name: cinema.name,
         address: cinema.Address,
         moviegenre:moviename.genre,
+        posterUrl:cinema.posterUrl,
         screenid:screenIds[0],
         time: cinemaShowtimes.map(screen => screen.showtimes) || 'No showtime available',
     };

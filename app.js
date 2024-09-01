@@ -80,8 +80,7 @@ app.post("/api/screen/webhooks", express.raw({ type: 'application/json' }), asyn
             });
             
             try {
-                const email=localStorage.getItem("name");
-                
+                const email=localStorage.getItem("user");
                 console.log(email);
                 //   console.log(user.email);
                 const confirmationEmail = {
