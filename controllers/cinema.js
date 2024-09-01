@@ -82,7 +82,7 @@ export const getallcinema=async(req,res,next)=>{
 };
 export const getcinemabyId=async(req,res,next)=>{
     try {
-        const cinema=await Cinema.findById(req.params.id).populate("name image address");
+        const cinema=await Cinema.findById(req.params.id).populate("name  Address");
         res.status(200).json(cinema);
     } catch (err) {
         next(err);
