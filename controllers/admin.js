@@ -10,6 +10,7 @@
 //     }
 //     const profile=await Admin.create(req.body);
 //     res.status(StatusCodes.CREATED.json({profile}));
+// hi
 // }
 
 // export const updateprofile=async(req,res,next)=>{
